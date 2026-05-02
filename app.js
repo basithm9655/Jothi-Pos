@@ -238,7 +238,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Form Submit Handler
   orderForm.addEventListener('submit', (e) => {
     // Show success immediately to user while iframe loads in background
-    alert(`Thank you for your order!\n\nProducts: ${document.getElementById('entry_product').value}\nTotal Amount: ${document.getElementById('form-total-amount').textContent}\n\nOur team will contact you shortly to confirm.`);
+    const customerName = document.getElementById('entry_name').value || 'Customer';
+    const customerEmail = document.getElementById('entry_email').value;
+    const emailLine = customerEmail ? `\nEmail: ${customerEmail}` : '';
+    alert(`🎉 Thank you, ${customerName}!\n\nYour order has been placed successfully.\n\nProducts: ${document.getElementById('entry_product').value}\nTotal Amount: ${document.getElementById('form-total-amount').textContent}${emailLine}\n\nOur team will contact you shortly via WhatsApp to confirm.`);
     closeModal();
     if(window.clearCart) window.clearCart();
   });
