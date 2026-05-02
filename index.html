@@ -374,9 +374,55 @@
                     <i class="fas fa-arrow-left"></i> Back
                   </button>
                   <button type="button" class="btn btn-gold btn-submit" id="btn-proceed-payment">
-                    Proceed <i class="fas fa-arrow-right"></i>
+                    Proceed to Payment <i class="fas fa-arrow-right"></i>
                   </button>
-               
+                </div>
+              </div>
+
+              <div id="checkout-step-2" style="display: none; text-align: center; padding: 10px 0;">
+                <div style="margin-bottom: 20px;">
+                  <h4 style="color: var(--color-gold); margin-bottom: 10px;">Bank Transfer Details</h4>
+                  <p style="font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 5px;">Transfer the amount to the following bank account:</p>
+                  
+                  <div style="text-align: left; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px dashed var(--color-gold); margin: 10px 0; display: inline-block;">
+                    <div style="margin-bottom: 8px;">
+                      <span style="color: var(--color-text-muted); font-size: 0.8rem; display: block;">Account Holder Name</span>
+                      <strong style="color: #fff; font-size: 1rem; letter-spacing: 0.5px;">HEARISH THIRUMALAI SHANTHI JOTHI</strong>
+                    </div>
+                    <div style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+                      <div>
+                        <span style="color: var(--color-text-muted); font-size: 0.8rem; display: block;">Account Number</span>
+                        <strong style="color: #fff; font-size: 1.2rem; letter-spacing: 1px;">110203292669</strong>
+                      </div>
+                      <button type="button" onclick="copyText('110203292669', this)" style="background: rgba(212,175,55,0.1); border: 1px solid var(--color-gold); color: var(--color-gold); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s; display: flex; align-items: center; gap: 5px;" onmouseover="this.style.background='rgba(212,175,55,0.2)'" onmouseout="this.style.background='rgba(212,175,55,0.1)'"><i class="fas fa-copy"></i> Copy</button>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+                      <div>
+                        <span style="color: var(--color-text-muted); font-size: 0.8rem; display: block;">IFSC Code</span>
+                        <strong style="color: #fff; font-size: 1.1rem; letter-spacing: 1px;">CNRB0001343</strong>
+                      </div>
+                      <button type="button" onclick="copyText('CNRB0001343', this)" style="background: rgba(212,175,55,0.1); border: 1px solid var(--color-gold); color: var(--color-gold); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s; display: flex; align-items: center; gap: 5px;" onmouseover="this.style.background='rgba(212,175,55,0.2)'" onmouseout="this.style.background='rgba(212,175,55,0.1)'"><i class="fas fa-copy"></i> Copy</button>
+                    </div>
+                  </div>
+
+                  <div style="margin-top: 15px;">
+                    <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 10px;">Or pay directly via your UPI app:</p>
+                    <div style="display: flex; justify-content: center; gap: 10px;">
+                      <a href="upi://pay" class="btn" style="background: #fff; color: #111; border: none; font-weight: 600; font-size: 0.85rem; padding: 8px 15px; border-radius: 6px; display: flex; align-items: center; gap: 8px; text-decoration: none;"><i class="fab fa-google-pay" style="font-size: 1.5rem; color: #1a73e8;"></i> GPay</a>
+                      <a href="upi://pay" class="btn" style="background: #fff; color: #111; border: none; font-weight: 600; font-size: 0.85rem; padding: 8px 15px; border-radius: 6px; display: flex; align-items: center; gap: 8px; text-decoration: none;"><svg style="width: 20px; height: 20px; fill: #5f259f;" viewBox="0 0 24 24"><path d="M12.01 0a12 12 0 1012 12A12.013 12.013 0 0012.01 0zM11 17h-2V7h5.17a3.5 3.5 0 013.5 3.5 3.5 3.5 0 01-3.5 3.5H11zm2.17-8H11v3h2.17a1.5 1.5 0 100-3z"/></svg> PhonePe</a>
+                    </div>
+                  </div>
+
+                </div>
+                
+                <div style="background: rgba(212, 175, 55, 0.1); border-left: 3px solid var(--color-gold); padding: 10px; margin-bottom: 20px; text-align: left; font-size: 0.85rem;">
+                  <p style="margin: 0;"><i class="fas fa-info-circle" style="color: var(--color-gold); margin-right: 5px;"></i> <strong>Important:</strong> After placing the order, please share a small screenshot of your payment via WhatsApp to confirm.</p>
+                </div>
+
+                <div class="form-group" style="text-align: left;">
+                  <label for="entry_utr">Transaction Reference No. (Optional)</label>
+                  <input type="text" id="entry_utr" class="form-control" placeholder="e.g. UTR or Ref Number">
+                </div>
 
                 <div class="form-actions" style="margin-top: 20px;">
                   <button type="button" class="btn btn-back" id="btn-back-to-step1">
