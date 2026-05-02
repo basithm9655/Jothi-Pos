@@ -243,111 +243,68 @@ document.addEventListener('DOMContentLoaded', () => {
     if(window.clearCart) window.clearCart();
   });
 
-  // ===================== AUTO-FILL LOCATION MAP =====================
+  // ===================== AUTO-FILL LOCATION =====================
   const btnGetLocation = document.getElementById('btn-get-location');
   const entryAddress = document.getElementById('entry_address');
   const entryPincode = document.getElementById('entry_pincode');
   
-  const mapModalOverlay = document.getElementById('map-modal-overlay');
-  const closeMapBtn = document.getElementById('close-map-btn');
-  const confirmLocationBtn = document.getElementById('confirm-location-btn');
-  
-  let map, marker;
-  let selectedLat = 20.5937; // Default India
-  let selectedLng = 78.9629;
-
   if (btnGetLocation) {
     btnGetLocation.addEventListener('click', () => {
-      // Open the map modal
-      mapModalOverlay.classList.add('active');
-      
-      // Initialize map once
-      if (!map) {
-        map = L.map('map-container').setView([selectedLat, selectedLng], 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        marker = L.marker([selectedLat, selectedLng], {draggable: true}).addTo(map);
-
-        // Try getting actual precise location
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(pos => {
-            selectedLat = pos.coords.latitude;
-            selectedLng = pos.coords.longitude;
-            map.setView([selectedLat, selectedLng], 15);
-            marker.setLatLng([selectedLat, selectedLng]);
-          });
-        }
-
-        // On Map click, move marker
-        map.on('click', function(e) {
-          selectedLat = e.latlng.lat;
-          selectedLng = e.latlng.lng;
-          marker.setLatLng(e.latlng);
-        });
-
-        // On Marker drag end, update coords
-        marker.on('dragend', function(e) {
-          const position = marker.getLatLng();
-          selectedLat = position.lat;
-          selectedLng = position.lng;
-        });
-      }
-      
-      // Fix leaflet tile rendering issue in modals
-      setTimeout(() => {
-        map.invalidateSize();
-      }, 100);
-    });
-  }
-
-  // Close map modal
-  if (closeMapBtn) {
-    closeMapBtn.addEventListener('click', () => {
-      mapModalOverlay.classList.remove('active');
-    });
-  }
-
-  // Confirm location and fetch address
-  if (confirmLocationBtn) {
-    confirmLocationBtn.addEventListener('click', async () => {
-      mapModalOverlay.classList.remove('active');
-      
       const originalText = btnGetLocation.innerHTML;
       btnGetLocation.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
       btnGetLocation.disabled = true;
 
-      try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${selectedLat}&lon=${selectedLng}`);
-        const data = await response.json();
-        
-        if (data && data.address) {
-          const addr = data.address;
-          const formattedAddress = [
-            addr.house_number, addr.road, addr.suburb, addr.neighbourhood,
-            addr.city || addr.town || addr.village, 
-            addr.state
-          ].filter(Boolean).join(', ');
-          
-          entryAddress.value = formattedAddress;
-          
-          if (addr.postcode) {
-            entryPincode.value = addr.postcode;
-          }
-        } else {
-          entryAddress.value = `Lat: ${selectedLat.toFixed(4)}, Lng: ${selectedLng.toFixed(4)}`;
-        }
-      } catch (error) {
-        console.error("Error fetching address:", error);
-        entryAddress.value = `Lat: ${selectedLat.toFixed(4)}, Lng: ${selectedLng.toFixed(4)}`;
-      } finally {
-        btnGetLocation.innerHTML = '<i class="fas fa-check"></i> Found';
-        setTimeout(() => {
-          btnGetLocation.innerHTML = originalText;
-          btnGetLocation.disabled = false;
-        }, 3000);
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser");
+        btnGetLocation.innerHTML = originalText;
+        btnGetLocation.disabled = false;
+        return;
       }
+
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+          const data = await response.json();
+          
+          if (data && data.address) {
+            const addr = data.address;
+            const formattedAddress = [
+              addr.house_number, addr.road, addr.suburb, addr.neighbourhood,
+              addr.city || addr.town || addr.village, 
+              addr.state
+            ].filter(Boolean).join(', ');
+            
+            entryAddress.value = formattedAddress;
+            
+            if (addr.postcode) {
+              entryPincode.value = addr.postcode;
+            }
+          } else {
+            entryAddress.value = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
+          }
+        } catch (error) {
+          console.error("Error fetching address:", error);
+          entryAddress.value = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
+        } finally {
+          btnGetLocation.innerHTML = '<i class="fas fa-check"></i> Found';
+          setTimeout(() => {
+            btnGetLocation.innerHTML = originalText;
+            btnGetLocation.disabled = false;
+          }, 3000);
+        }
+      }, (err) => {
+        console.warn(`ERROR(${err.code}): ${err.message}`);
+        alert("Unable to retrieve your location. Please check location permissions.");
+        btnGetLocation.innerHTML = originalText;
+        btnGetLocation.disabled = false;
+      }, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      });
     });
   }
 
