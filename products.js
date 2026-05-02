@@ -151,92 +151,28 @@ const PRODUCTS = [
   },
   {
     id: 7,
-    category: "paper-rolls",
-    categoryLabel: "Paper Rolls",
-    name: "Thermal Paper Rolls — 2 Inch",
-    subtitle: "Set of 25 Rolls / 12 Meter Each",
+    category: "thermal-printer",
+    categoryLabel: "thermal-printer",
+    name: "Portable Thermal Printer - Label Printer",
+    subtitle: "- Restaurant Receipt Barcode Ticket Machine",
     price: null,
-    originalPrice: null,
+    originalPrice: 4499,
     discount: null,
-    description: "Receipt type thermal paper rolls. Suitable for 2 inch thermal printers. 58mm/2 inch width, 12 meters length per roll. Set of 25 rolls. Black ink.",
+    description: "Portable Thermal Printer - Label Printer - Restaurant Receipt Barcode Ticket Machine",
     specs: {
-      "Type": "Receipt",
-      "Width": "58mm / 2 inch",
-      "Length": "12 Meters/roll",
-      "Quantity": "25 rolls",
-      "Ink": "Black"
+      "Type": "Thermal",
+      "Width": "80mm",
+      "Length": "-",
+      "Quantity": "1",
+      "Colour": "Black"
     },
     images: [
-      "https://posbox.in/wp-content/uploads/2025/02/1.jpg",
-      "https://posbox.in/wp-content/uploads/2025/02/2.jpg",
-      "https://posbox.in/wp-content/uploads/2025/02/3.jpg",
-      "https://posbox.in/wp-content/uploads/2025/02/4.jpg"
+      "https://s.alicdn.com/@sc04/kf/H85d3c3176b87493697af87b74a0f3306a.png?avif=close&webp=close",
+      "https://s.alicdn.com/@sc04/kf/H38e78fc70ec042ed8ff5160bea65eeca8.png?avif=close&webp=close",
+      "https://s.alicdn.com/@sc04/kf/Hbd2d98124af54dcf8d69eb59dcbf155eA.png?avif=close&webp=close"
     ],
     badge: "PACK DEAL",
     badgeColor: "#8e44ad"
-  },
-  {
-    id: 8,
-    category: "paper-rolls",
-    categoryLabel: "Paper Rolls",
-    name: "Thermal Paper Rolls — 3 Inch",
-    subtitle: "Multiple Pack Options / 25 Meter Each",
-    price: 450,
-    originalPrice: null,
-    discount: null,
-    description: "Thermal paper rolls for 3 inch printers. 80mm width, 25 meters per roll. Available in sets of 10, 50, and 100 rolls. Black ink. Perfect for all 80mm thermal printers.",
-    specs: {
-      "Type": "Receipt",
-      "Width": "80mm / 3 inch",
-      "Length": "25 Meters/roll",
-      "Packs": "10 / 50 / 100 rolls",
-      "Ink": "Black"
-    },
-    images: [
-      "https://posbox.in/wp-content/uploads/2024/11/Roll_8025_10.jpg",
-      "https://posbox.in/wp-content/uploads/2024/11/15-3.jpg",
-      "https://posbox.in/wp-content/uploads/2024/11/7-3.jpg"
-    ],
-    variants: [
-      { label: "10 Rolls", price: 450 },
-      { label: "50 Rolls", price: 1749 },
-      { label: "100 Rolls", price: 2999 }
-    ],
-    badge: "PACK DEAL",
-    badgeColor: "#8e44ad"
-  },
-  {
-    id: 9,
-    category: "barcode-scanner",
-    categoryLabel: "Barcode Scanner",
-    name: "1D Barcode USB Handheld Scanner",
-    subtitle: "Wired Gun Type | CCD Technology",
-    price: null,
-    originalPrice: null,
-    discount: null,
-    description: "1D Barcode USB Scanner Handheld Wired (Gun Type) with Fast Scanning CCD Technology. USB connectivity, No battery required. Supports 1D barcodes, continuous scanning mode. CMOS technology for enhanced performance in low-light. Ergonomic gun-shaped design for comfort. Color: Black.",
-    specs: {
-      "Connectivity": "USB (Wired)",
-      "Battery": "No Battery Required",
-      "1D Barcodes": "Yes",
-      "2D / QR Codes": "No",
-      "Technology": "CCD / CMOS",
-      "Scanning Mode": "Continuous",
-      "Color": "Black"
-    },
-    images: [
-      "https://posbox.in/wp-content/uploads/2024/11/Main-6.jpg",
-      "https://posbox.in/wp-content/uploads/2024/11/1-42.jpg",
-      "https://posbox.in/wp-content/uploads/2024/11/2-24.jpg",
-      "https://posbox.in/wp-content/uploads/2024/11/3-27.jpg",
-      "http://posbox.in/wp-content/uploads/2024/11/1-43.jpg",
-      "http://posbox.in/wp-content/uploads/2024/11/2-25.jpg",
-      "http://posbox.in/wp-content/uploads/2024/11/3-28.jpg",
-      "http://posbox.in/wp-content/uploads/2024/11/4-20.jpg",
-      "http://posbox.in/wp-content/uploads/2024/11/5-16.jpg"
-    ],
-    badge: "POPULAR",
-    badgeColor: "#D4AF37"
   }
 ];
 
