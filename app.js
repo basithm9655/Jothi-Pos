@@ -1,0 +1,490 @@
+document.addEventListener('DOMContentLoaded', () => {
+  // ===================== VARIABLES =====================
+  const navbar = document.getElementById('navbar');
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('nav-links');
+  const productsGrid = document.getElementById('products-grid');
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const backToTopBtn = document.getElementById('back-to-top');
+
+  // Modal Elements
+  const modalOverlay = document.getElementById('modal-overlay');
+  const flipCardContainer = document.getElementById('flip-card');
+  const closeBtns = document.querySelectorAll('.modal-close-btn');
+  const btnBuyNow = document.getElementById('btn-buy-now');
+  const btnBackToProduct = document.getElementById('btn-back-to-product');
+  const orderForm = document.getElementById('google-order-form');
+  const qtyInput = document.getElementById('entry_quantity');
+  
+  let currentProduct = null;
+
+  // ===================== INITIALIZE =====================
+  initParticles();
+  initCustomCursor();
+  renderProducts('all');
+  initScrollEvents();
+
+  // ===================== NAVBAR & MENU =====================
+  hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('active');
+    const spans = hamburger.querySelectorAll('span');
+    if (navLinks.classList.contains('active')) {
+      spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+      spans[1].style.opacity = '0';
+      spans[2].style.transform = 'rotate(-45deg) translate(5px, -5px)';
+    } else {
+      spans[0].style.transform = 'none';
+      spans[1].style.opacity = '1';
+      spans[2].style.transform = 'none';
+    }
+  });
+
+  // Close menu on link click (mobile)
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      if(window.innerWidth <= 768) hamburger.click();
+    });
+  });
+
+  // ===================== RENDER PRODUCTS =====================
+  function renderProducts(filter) {
+    productsGrid.innerHTML = '';
+    
+    // PRODUCTS array comes from products.js
+    const filteredProducts = filter === 'all' 
+      ? PRODUCTS 
+      : PRODUCTS.filter(p => p.category === filter);
+
+    filteredProducts.forEach(product => {
+      const card = document.createElement('div');
+      card.className = 'product-card reveal-up';
+      card.style.animationDelay = '0.1s';
+      
+      const badgeHtml = product.badge ? `<span class="product-badge">${product.badge}</span>` : '';
+      const originalPriceHtml = product.originalPrice ? `<span class="original-price">₹${product.originalPrice}</span>` : '';
+      
+      card.innerHTML = `
+        ${badgeHtml}
+        <div class="product-img-wrap">
+          <img src="${product.images[0]}" alt="${product.name}" loading="lazy">
+        </div>
+        <div class="product-info">
+          <span class="product-cat">${product.category.replace('-', ' ')}</span>
+          <h3 class="product-title">${product.name}</h3>
+          <div class="product-price">
+            <span class="current-price">₹${product.price !== null ? product.price : 'Price on Request'}</span>
+            ${originalPriceHtml}
+          </div>
+          <button class="btn btn-gold btn-full view-product-btn" data-id="${product.id}">
+            Shop Now
+          </button>
+        </div>
+      `;
+      productsGrid.appendChild(card);
+    });
+
+    // Attach event listeners to new buttons
+    document.querySelectorAll('.view-product-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = parseInt(e.currentTarget.getAttribute('data-id'));
+        openProductModal(id);
+      });
+    });
+  }
+
+  // ===================== PRODUCT FILTERING =====================
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderProducts(btn.getAttribute('data-filter'));
+    });
+  });
+
+  // ===================== FLIP-CARD MODAL =====================
+  function openProductModal(id) {
+    currentProduct = PRODUCTS.find(p => p.id === id);
+    if(!currentProduct) return;
+
+    // Reset Flip
+    flipCardContainer.classList.remove('flipped');
+    
+    // Populate Front (Product Details)
+    document.getElementById('modal-main-img').src = currentProduct.images[0];
+    
+    // Setup Thumbnails
+    const thumbsContainer = document.getElementById('modal-thumbnails');
+    if (thumbsContainer) {
+      thumbsContainer.innerHTML = '';
+      if (currentProduct.images && currentProduct.images.length > 1) {
+        currentProduct.images.forEach((imgUrl, idx) => {
+          const thumb = document.createElement('img');
+          thumb.src = imgUrl;
+          thumb.style.width = '60px';
+          thumb.style.height = '60px';
+          thumb.style.objectFit = 'contain';
+          thumb.style.border = idx === 0 ? '2px solid var(--color-gold)' : '1px solid rgba(255,255,255,0.1)';
+          thumb.style.borderRadius = '4px';
+          thumb.style.cursor = 'pointer';
+          thumb.style.background = '#fff';
+          thumb.style.transition = 'all 0.3s';
+          
+          thumb.addEventListener('click', () => {
+            document.getElementById('modal-main-img').src = imgUrl;
+            // Update active thumbnail border
+            Array.from(thumbsContainer.children).forEach(t => t.style.border = '1px solid rgba(255,255,255,0.1)');
+            thumb.style.border = '2px solid var(--color-gold)';
+          });
+          
+          thumbsContainer.appendChild(thumb);
+        });
+      }
+    }
+
+    document.getElementById('modal-name').textContent = currentProduct.name;
+    document.getElementById('modal-pricing').textContent = currentProduct.price ? `₹${currentProduct.price}` : 'Price on Request';
+    document.getElementById('modal-desc').textContent = currentProduct.description;
+    
+    const badgeEl = document.getElementById('modal-badge');
+    if(currentProduct.badge) {
+      badgeEl.textContent = currentProduct.badge;
+      badgeEl.style.display = 'inline-block';
+    } else {
+      badgeEl.style.display = 'none';
+    }
+
+    const specsContainer = document.getElementById('modal-specs');
+    specsContainer.innerHTML = '';
+    for(const [key, value] of Object.entries(currentProduct.specs)) {
+      specsContainer.innerHTML += `
+        <div class="spec-item">
+          <span class="spec-label">${key}</span>
+          <span class="spec-value">${value}</span>
+        </div>
+      `;
+    }
+
+    // Populate Back (Form Summary)
+    document.getElementById('form-summary-img').src = currentProduct.images[0];
+    document.getElementById('form-summary-name').textContent = currentProduct.name;
+    document.getElementById('form-summary-price').textContent = currentProduct.price ? `₹${currentProduct.price}` : 'Request Price';
+    
+    // Set hidden inputs for Google Form
+    document.getElementById('entry_product').value = currentProduct.name;
+    
+    // Reset quantity and total
+    qtyInput.value = 1;
+    updateTotal();
+
+    // Show Modal
+    modalOverlay.classList.add('active');
+  }
+
+  function closeModal() {
+    modalOverlay.classList.remove('active');
+    setTimeout(() => {
+      flipCardContainer.classList.remove('flipped');
+      orderForm.reset();
+    }, 300); // wait for fade out
+  }
+
+  closeBtns.forEach(btn => btn.addEventListener('click', closeModal));
+  
+  modalOverlay.addEventListener('click', (e) => {
+    if(e.target === modalOverlay) closeModal();
+  });
+
+  // Flip Actions
+  btnBuyNow.addEventListener('click', () => {
+    flipCardContainer.classList.add('flipped');
+  });
+
+  btnBackToProduct.addEventListener('click', () => {
+    flipCardContainer.classList.remove('flipped');
+  });
+
+  // Quantity change -> update total
+  qtyInput.addEventListener('input', updateTotal);
+  qtyInput.addEventListener('change', updateTotal);
+
+  function updateTotal() {
+    if(!currentProduct || document.getElementById('form-summary-name').textContent === "Cart Order (Multiple Items)") return;
+    const qty = parseInt(qtyInput.value) || 1;
+    const total = (currentProduct.price || 0) * qty;
+    document.getElementById('form-total-amount').textContent = `₹${total}`;
+  }
+
+  // Open Checkout from Cart
+  window.openCartCheckout = function(cartItems, totalAmount) {
+    if (cartItems.length === 0) return;
+    
+    // Combine names
+    const combinedNames = cartItems.map(item => `${item.title} (x${item.qty})`).join(', ');
+
+    // Populate Back (Form Summary)
+    document.getElementById('form-summary-img').src = cartItems[0].img;
+    document.getElementById('form-summary-name').textContent = "Cart Order (Multiple Items)";
+    document.getElementById('form-summary-price').textContent = `₹${totalAmount}`;
+    
+    document.getElementById('entry_product').value = combinedNames;
+    qtyInput.value = 1; 
+    document.getElementById('form-total-amount').textContent = `₹${totalAmount}`;
+
+    // Show Modal flipped directly
+    modalOverlay.classList.add('active');
+    flipCardContainer.classList.add('flipped');
+  };
+
+  // Form Submit Handler
+  orderForm.addEventListener('submit', (e) => {
+    // Show success immediately to user while iframe loads in background
+    alert(`Thank you for your order!\n\nProducts: ${document.getElementById('entry_product').value}\nTotal Amount: ${document.getElementById('form-total-amount').textContent}\n\nOur team will contact you shortly to confirm.`);
+    closeModal();
+    if(window.clearCart) window.clearCart();
+  });
+
+  // ===================== AUTO-FILL LOCATION MAP =====================
+  const btnGetLocation = document.getElementById('btn-get-location');
+  const entryAddress = document.getElementById('entry_address');
+  const entryPincode = document.getElementById('entry_pincode');
+  
+  const mapModalOverlay = document.getElementById('map-modal-overlay');
+  const closeMapBtn = document.getElementById('close-map-btn');
+  const confirmLocationBtn = document.getElementById('confirm-location-btn');
+  
+  let map, marker;
+  let selectedLat = 20.5937; // Default India
+  let selectedLng = 78.9629;
+
+  if (btnGetLocation) {
+    btnGetLocation.addEventListener('click', () => {
+      // Open the map modal
+      mapModalOverlay.classList.add('active');
+      
+      // Initialize map once
+      if (!map) {
+        map = L.map('map-container').setView([selectedLat, selectedLng], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        marker = L.marker([selectedLat, selectedLng], {draggable: true}).addTo(map);
+
+        // Try getting actual precise location
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(pos => {
+            selectedLat = pos.coords.latitude;
+            selectedLng = pos.coords.longitude;
+            map.setView([selectedLat, selectedLng], 15);
+            marker.setLatLng([selectedLat, selectedLng]);
+          });
+        }
+
+        // On Map click, move marker
+        map.on('click', function(e) {
+          selectedLat = e.latlng.lat;
+          selectedLng = e.latlng.lng;
+          marker.setLatLng(e.latlng);
+        });
+
+        // On Marker drag end, update coords
+        marker.on('dragend', function(e) {
+          const position = marker.getLatLng();
+          selectedLat = position.lat;
+          selectedLng = position.lng;
+        });
+      }
+      
+      // Fix leaflet tile rendering issue in modals
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 100);
+    });
+  }
+
+  // Close map modal
+  if (closeMapBtn) {
+    closeMapBtn.addEventListener('click', () => {
+      mapModalOverlay.classList.remove('active');
+    });
+  }
+
+  // Confirm location and fetch address
+  if (confirmLocationBtn) {
+    confirmLocationBtn.addEventListener('click', async () => {
+      mapModalOverlay.classList.remove('active');
+      
+      const originalText = btnGetLocation.innerHTML;
+      btnGetLocation.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
+      btnGetLocation.disabled = true;
+
+      try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${selectedLat}&lon=${selectedLng}`);
+        const data = await response.json();
+        
+        if (data && data.address) {
+          const addr = data.address;
+          const formattedAddress = [
+            addr.house_number, addr.road, addr.suburb, addr.neighbourhood,
+            addr.city || addr.town || addr.village, 
+            addr.state
+          ].filter(Boolean).join(', ');
+          
+          entryAddress.value = formattedAddress;
+          
+          if (addr.postcode) {
+            entryPincode.value = addr.postcode;
+          }
+        } else {
+          entryAddress.value = `Lat: ${selectedLat.toFixed(4)}, Lng: ${selectedLng.toFixed(4)}`;
+        }
+      } catch (error) {
+        console.error("Error fetching address:", error);
+        entryAddress.value = `Lat: ${selectedLat.toFixed(4)}, Lng: ${selectedLng.toFixed(4)}`;
+      } finally {
+        btnGetLocation.innerHTML = '<i class="fas fa-check"></i> Found';
+        setTimeout(() => {
+          btnGetLocation.innerHTML = originalText;
+          btnGetLocation.disabled = false;
+        }, 3000);
+      }
+    });
+  }
+
+  // ===================== SCROLL EVENTS & REVEAL =====================
+  function initScrollEvents() {
+    const reveals = document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right');
+    
+    const revealElements = () => {
+      const windowHeight = window.innerHeight;
+      const elementVisible = 150;
+      
+      reveals.forEach(reveal => {
+        const elementTop = reveal.getBoundingClientRect().top;
+        if (elementTop < windowHeight - elementVisible) {
+          reveal.classList.add('active');
+        }
+      });
+    };
+
+    window.addEventListener('scroll', () => {
+      // Navbar effect
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+
+      // Back to top button
+      if (window.scrollY > 500) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
+      }
+
+      // Scroll spy for active nav link
+      let current = '';
+      document.querySelectorAll('section').forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (pageYOffset >= sectionTop - 100) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      navLinks.querySelectorAll('a').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.classList.add('active');
+        }
+      });
+
+      revealElements();
+    });
+
+    // Initial check
+    revealElements();
+    
+    // Back to top click
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // ===================== CUSTOM CURSOR =====================
+  function initCustomCursor() {
+    const cursor = document.getElementById('cursor-glow');
+    if(window.innerWidth > 768 && cursor) {
+      window.addEventListener('mousemove', (e) => {
+        cursor.style.top = e.clientY + 'px';
+        cursor.style.left = e.clientX + 'px';
+      });
+
+      // Interactive elements hover effect
+      const interactives = document.querySelectorAll('a, button, .product-card');
+      interactives.forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('active'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('active'));
+      });
+    }
+  }
+
+  // ===================== BACKGROUND PARTICLES =====================
+  function initParticles() {
+    const canvas = document.getElementById('particles-canvas');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const particles = [];
+    const colors = ['rgba(212, 175, 55, 0.2)', 'rgba(212, 175, 55, 0.4)', 'rgba(255, 255, 255, 0.1)'];
+
+    for (let i = 0; i < 50; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2 + 1,
+        dx: (Math.random() - 0.5) * 0.5,
+        dy: (Math.random() - 0.5) * 0.5,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        
+        p.x += p.dx;
+        p.y += p.dy;
+        
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+      });
+      requestAnimationFrame(draw);
+    }
+    draw();
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  }
+
+  // Footer Year
+  const yearEl = document.getElementById('footer-year');
+  if(yearEl) yearEl.textContent = new Date().getFullYear();
+
+});
+
+// Global form submit handler for contact section fallback
+window.handleFormSubmit = function(e) {
+  setTimeout(() => {
+    document.getElementById('fallback-contact-form').style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+  }, 1000);
+}

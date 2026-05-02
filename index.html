@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="JOTHI POS – Smart Billing. Premium Experience. Shop thermal printers, barcode scanners, and POS accessories at the best prices. Since 2021." />
+  <meta name="keywords" content="POS, thermal printer, barcode scanner, billing machine, JOTHI POS, receipt printer" />
+  <meta name="author" content="JOTHI POS" />
+  <meta property="og:title" content="JOTHI POS – Smart Billing. Premium Experience." />
+  <meta property="og:description"
+    content="Shop premium POS hardware – Thermal Printers, Barcode Scanners, and Accessories. Since 2021." />
+  <meta property="og:image" content="logo.png" />
+  <title>JOTHI POS – Smart Billing. Premium Experience.</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="cart.css" />
+</head>
+
+<body>
+
+  <!-- ===================== MAP MODAL ===================== -->
+  <div class="modal-overlay" id="map-modal-overlay" style="z-index: 3000;">
+    <div style="background:var(--color-bg-light); border-radius:16px; width:90%; max-width:600px; padding:20px; position:relative; box-shadow: var(--shadow-card);">
+      <button class="modal-close-btn" id="close-map-btn" style="top:15px;right:15px;"><i class="fas fa-times"></i></button>
+      <h3 style="margin-bottom:15px; color:var(--color-gold);">Select Your Location</h3>
+      <p style="font-size:0.85rem; color:var(--color-text-muted); margin-bottom:10px;">Drag the marker or click on the map to select.</p>
+      <div id="map-container" style="width:100%; height:400px; border-radius:8px; background:#ddd; z-index:1;"></div>
+      <div style="margin-top:15px; display:flex; justify-content:flex-end;">
+        <button class="btn btn-gold" id="confirm-location-btn">Confirm Location</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CURSOR GLOW ===================== -->
+  <div id="cursor-glow"></div>
+
+  <!-- ===================== PARTICLES ===================== -->
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav id="navbar">
+    <div class="nav-container">
+      <a href="#home" class="nav-logo" id="nav-logo-link">
+        <img src="logo.png" alt="JOTHI POS Logo" id="nav-logo-img" />
+        <span class="nav-brand">JOTHI POS</span>
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#home" class="nav-link active">Home</a></li>
+        <li><a href="#products" class="nav-link">Products</a></li>
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="cart-btn" id="cart-toggle-btn" aria-label="Cart">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-count" id="cart-count">0</span>
+        </button>
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===================== CART SIDEBAR ===================== -->
+  <div class="cart-overlay" id="cart-overlay"></div>
+  <aside class="cart-sidebar" id="cart-sidebar">
+    <div class="cart-header">
+      <h3>Your Cart <span class="gold-text">(<span id="cart-item-count">0</span>)</span></h3>
+      <button class="cart-close" id="cart-close" aria-label="Close Cart"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="cart-items" id="cart-items">
+      <div class="cart-empty" id="cart-empty">
+        <i class="fas fa-shopping-cart"></i>
+        <p>Your cart is empty</p>
+      </div>
+    </div>
+    <div class="cart-footer" id="cart-footer" style="display:none;">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span class="gold-text" id="cart-total">₹0</span>
+      </div>
+      <button class="btn btn-gold btn-full" id="checkout-cart-btn">
+        <i class="fas fa-check-circle"></i> Checkout
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===================== HERO SECTION ===================== -->
+  <section id="home" class="hero-section">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-content">
+      <div class="hero-badge reveal-up">SINCE 2021 · TRUSTED POS BRAND</div>
+      <div class="hero-logo reveal-up" style="animation-delay:0.1s">
+        <img src="logo.png" alt="JOTHI POS" id="hero-logo" />
+      </div>
+      <h1 class="hero-title reveal-up" style="animation-delay:0.2s">
+        <span class="gold-gradient-text">Smart Billing.</span><br />Premium Experience.
+      </h1>
+      <p class="hero-subtitle reveal-up" style="animation-delay:0.35s">
+        India's most trusted POS hardware brand. Thermal printers, barcode scanners,<br /> and accessories built for the
+        modern business.
+      </p>
+      <div class="hero-ctas reveal-up" style="animation-delay:0.5s">
+        <a href="#products" class="btn btn-gold" id="shop-now-btn">
+          <span>Shop Now</span> <i class="fas fa-arrow-right"></i>
+        </a>
+        <a href="https://wa.me/919025957649" target="_blank" class="btn btn-outline" id="hero-whatsapp-btn">
+          <i class="fab fa-whatsapp"></i> <span>Chat on WhatsApp</span>
+        </a>
+      </div>
+      <div class="hero-stats reveal-up" style="animation-delay:0.65s">
+        <div class="stat">
+          <span class="stat-num gold-gradient-text">500+</span>
+          <span class="stat-label">Happy Clients</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num gold-gradient-text">10+</span>
+          <span class="stat-label">Products</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num gold-gradient-text">4.9★</span>
+          <span class="stat-label">Rating</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-scroll-indicator">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ===================== PRODUCTS SECTION ===================== -->
+  <section id="products" class="section products-section">
+    <div class="container">
+      <div class="section-header reveal-up">
+        <span class="section-eyebrow">Our Collection</span>
+        <h2 class="section-title">Premium <span class="gold-gradient-text">POS Hardware</span></h2>
+        <p class="section-subtitle">Industry-grade hardware designed for speed, reliability, and zero downtime.</p>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="filter-tabs reveal-up">
+        <button class="filter-btn active" data-filter="all" id="filter-all">All Products</button>
+        <button class="filter-btn" data-filter="thermal-printer" id="filter-printer">Thermal Printers</button>
+        <button class="filter-btn" data-filter="barcode-scanner" id="filter-scanner">Barcode Scanners</button>
+        <button class="filter-btn" data-filter="accessories" id="filter-accessories">Accessories</button>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" id="products-grid">
+        <!-- Dynamically populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PRODUCT MODAL (FLIP CARD) ===================== -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="flip-card-container" id="flip-card">
+      <div class="flip-card-inner">
+        <!-- FRONT: Product Details -->
+        <div class="flip-card-front">
+          <button class="modal-close-btn" aria-label="Close"><i class="fas fa-times"></i></button>
+          <div class="product-details">
+            <div class="modal-img-container">
+              <img src="" alt="" id="modal-main-img" />
+            </div>
+            <div id="modal-thumbnails" style="display:flex; gap:10px; margin-bottom:15px; overflow-x:auto; padding-bottom:5px;"></div>
+            <span class="product-badge" id="modal-badge"
+              style="position:relative;top:0;left:0;display:inline-block;margin-bottom:10px;"></span>
+            <h2 class="modal-product-title" id="modal-name">Product Name</h2>
+            <div class="modal-product-price" id="modal-pricing">₹0</div>
+            <p class="modal-product-desc" id="modal-desc">Description</p>
+            <div class="specs-list" id="modal-specs"></div>
+          </div>
+          <div class="front-actions">
+            <button class="btn btn-outline-gold btn-full" id="btn-add-to-cart">
+              <i class="fas fa-shopping-cart"></i> Add to Cart
+            </button>
+            <button class="btn btn-gold btn-full" id="btn-buy-now">
+              <i class="fas fa-bolt"></i> Buy Now
+            </button>
+          </div>
+        </div>
+
+        <!-- BACK: Order Form -->
+        <div class="flip-card-back">
+          <button class="modal-close-btn" aria-label="Close"><i class="fas fa-times"></i></button>
+          <div class="order-form-container">
+            <div class="form-header">
+              <h3>Secure Checkout</h3>
+              <p style="font-size: 0.85rem; color: var(--color-text-muted);">Fill your details to place the order.</p>
+            </div>
+            <div class="order-summary">
+              <div class="summary-img"><img src="" id="form-summary-img" alt=""></div>
+              <div class="summary-details">
+                <h4 id="form-summary-name">Product Name</h4>
+                <div class="summary-price" id="form-summary-price">₹0</div>
+              </div>
+            </div>
+
+            <!-- GOOGLE FORM INTEGRATION -->
+            <form id="google-order-form"
+              action="https://docs.google.com/forms/d/e/1FAIpQLSdGKe0AVEoCDF9sdDBmL55KCRmQdQpr5VsN8dwxV8oYZMJ1nA/formResponse"
+              method="POST" target="hidden_iframe">
+
+              <!-- Hidden Fields for Product Data -->
+              <input type="hidden" id="entry_product" name="entry.839337160" value="">
+
+              <div class="form-group">
+                <label for="entry_name">Full Name *</label>
+                <input type="text" id="entry_name" name="entry.2005620554" class="form-control"
+                  placeholder="Enter your name" required>
+              </div>
+              <div class="form-group">
+                <label for="entry_whatsapp">WhatsApp Number *</label>
+                <input type="tel" id="entry_whatsapp" name="entry.1045781291" class="form-control"
+                  placeholder="10-digit number" pattern="[0-9]{10}" required>
+              </div>
+              <div class="form-group">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.4rem; flex-wrap:wrap; gap:5px;">
+                  <label for="entry_address" style="margin-bottom:0;">Full Address *</label>
+                  <div style="display:flex; gap:5px;">
+                    <button type="button" id="btn-get-location" style="background:rgba(212, 175, 55, 0.1);border:1px solid var(--color-gold);color:var(--color-gold);cursor:pointer;font-size:0.7rem;padding:4px 8px;border-radius:4px;display:flex;align-items:center;gap:4px;transition:all 0.3s;" title="Auto-fill using GPS">
+                      <i class="fas fa-crosshairs"></i> Current Location
+                    </button>
+                    <button type="button" id="btn-open-map" style="background:var(--color-gold);border:1px solid var(--color-gold);color:#000;cursor:pointer;font-size:0.7rem;padding:4px 8px;border-radius:4px;display:flex;align-items:center;gap:4px;transition:all 0.3s;" title="Select from Map">
+                      <i class="fas fa-map"></i> Select on Map
+                    </button>
+                  </div>
+                </div>
+                <textarea id="entry_address" name="entry.1065046570" class="form-control" rows="2" placeholder="Street, City, Landmark" required></textarea>
+              </div>
+
+              <div class="qty-price-row form-group">
+                <div style="flex: 1;">
+                  <label for="entry_pincode">Pincode *</label>
+                  <input type="text" id="entry_pincode" name="entry.1166974658" class="form-control"
+                    placeholder="6 digits" pattern="[0-9]{6}" required>
+                </div>
+                <div style="flex: 1;">
+                  <label for="entry_quantity">Quantity *</label>
+                  <input type="number" id="entry_quantity" name="entry.820381845" class="form-control" value="1" min="1"
+                    max="10" required>
+                </div>
+              </div>
+
+              <div class="total-calc">
+                <span style="font-size:0.85rem; color:var(--color-text-muted);">Total Amount:</span>
+                <div class="total-amount" id="form-total-amount">₹0</div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-back" id="btn-back-to-product">
+                  <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button type="submit" class="btn btn-gold btn-submit" id="btn-confirm-order">
+                  Place Order <i class="fas fa-check"></i>
+                </button>
+              </div>
+            </form>
+            <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== FEATURES SECTION ===================== -->
+  <section id="features" class="section features-section">
+    <div class="container">
+      <div class="section-header reveal-up">
+        <span class="section-eyebrow">Why Choose Us</span>
+        <h2 class="section-title">Built for <span class="gold-gradient-text">Excellence</span></h2>
+        <p class="section-subtitle">Every product engineered for modern Indian businesses.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card reveal-up" style="--delay:0s">
+          <div class="feature-icon-wrap">
+            <span class="feature-icon">⚡</span>
+          </div>
+          <h3>Fast Billing</h3>
+          <p>High-speed thermal printing up to 200mm/s — serve customers faster and reduce queues.</p>
+        </div>
+        <div class="feature-card reveal-up" style="--delay:0.12s">
+          <div class="feature-icon-wrap">
+            <span class="feature-icon">📶</span>
+          </div>
+          <h3>Wireless Connectivity</h3>
+          <p>Seamless Bluetooth & WiFi support for a tidy, cable-free modern billing setup.</p>
+        </div>
+        <div class="feature-card reveal-up" style="--delay:0.24s">
+          <div class="feature-icon-wrap">
+            <span class="feature-icon">🛠️</span>
+          </div>
+          <h3>Zero Maintenance</h3>
+          <p>No ink, no ribbon, no cartridge. Thermal technology cuts your running costs to zero.</p>
+        </div>
+        <div class="feature-card reveal-up" style="--delay:0.36s">
+          <div class="feature-icon-wrap">
+            <span class="feature-icon">💼</span>
+          </div>
+          <h3>Business Ready</h3>
+          <p>Compatible with all major POS software, GST billing apps, and retail management systems.</p>
+        </div>
+        <div class="feature-card reveal-up" style="--delay:0.48s">
+          <div class="feature-icon-wrap">
+            <span class="feature-icon">🔒</span>
+          </div>
+          <h3>Reliable & Durable</h3>
+          <p>Industrial-grade build quality, tested for thousands of hours of continuous operation.</p>
+        </div>
+        <div class="feature-card reveal-up" style="--delay:0.60s">
+          <div class="feature-icon-wrap">
+            <span class="feature-icon">🚀</span>
+          </div>
+          <h3>Fast Delivery</h3>
+          <p>Pan-India shipping with express delivery options. Get your hardware in 1–3 business days.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ABOUT SECTION ===================== -->
+  <section id="about" class="section about-section">
+    <div class="container about-flex">
+      <div class="about-visual reveal-left">
+        <div class="about-logo-wrap">
+          <img src="logo.png" alt="JOTHI POS" class="about-logo" />
+          <div class="about-glow-ring"></div>
+        </div>
+        <div class="about-floating-badge">
+          <span class="gold-gradient-text">Since 2021</span>
+        </div>
+      </div>
+      <div class="about-content reveal-right">
+        <span class="section-eyebrow">Our Story</span>
+        <h2 class="section-title">Powering <span class="gold-gradient-text">Indian Businesses</span><br />Since 2021
+        </h2>
+        <p class="about-text">
+          JOTHI POS was founded with a single mission — to bring enterprise-grade POS hardware to every Indian business
+          at honest prices. We believe a shopkeeper in Coimbatore deserves the same quality tools as a chain retailer in
+          Mumbai.
+        </p>
+        <p class="about-text">
+          From compact 58mm Bluetooth printers for mobile billing to robust 80mm desktop units for supermarkets, every
+          product in our catalogue is carefully tested and curated for the Indian business environment.
+        </p>
+        <div class="about-highlights">
+          <div class="about-highlight">
+            <i class="fas fa-check-circle"></i>
+            <span>GST-compliant billing support</span>
+          </div>
+          <div class="about-highlight">
+            <i class="fas fa-check-circle"></i>
+            <span>Compatible with Android, iOS & Windows</span>
+          </div>
+          <div class="about-highlight">
+            <i class="fas fa-check-circle"></i>
+            <span>After-sales support via WhatsApp</span>
+          </div>
+          <div class="about-highlight">
+            <i class="fas fa-check-circle"></i>
+            <span>Trusted by 500+ businesses across India</span>
+          </div>
+        </div>
+        <a href="#contact" class="btn btn-gold" id="about-contact-btn">
+          <span>Get in Touch</span> <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CONTACT SECTION ===================== -->
+  <section id="contact" class="section contact-section">
+    <div class="container">
+      <div class="section-header reveal-up">
+        <span class="section-eyebrow">Get In Touch</span>
+        <h2 class="section-title">Talk to Our <span class="gold-gradient-text">Experts</span></h2>
+        <p class="section-subtitle">We're here to help you find the perfect POS solution.</p>
+      </div>
+
+      <div class="contact-grid">
+        <!-- Contact Info -->
+        <div class="contact-info reveal-left">
+          <div class="contact-card" id="contact-phone-card">
+            <div class="contact-card-icon"><i class="fas fa-phone-alt"></i></div>
+            <div class="contact-card-body">
+              <h4>Call Us</h4>
+              <a href="tel:+919025957649" class="gold-text">+91 9025957649</a>
+              <p>Mon–Sat, 9am–7pm</p>
+            </div>
+          </div>
+          <div class="contact-card" id="contact-whatsapp-card">
+            <div class="contact-card-icon whatsapp-icon"><i class="fab fa-whatsapp"></i></div>
+            <div class="contact-card-body">
+              <h4>WhatsApp</h4>
+              <a href="https://wa.me/919025957649" target="_blank" class="gold-text">+91 9025957649</a>
+              <p>Instant order support</p>
+            </div>
+          </div>
+          <div class="contact-card" id="contact-location-card">
+            <div class="contact-card-icon"><i class="fas fa-map-marker-alt"></i></div>
+            <div class="contact-card-body">
+              <h4>Location</h4>
+              <span class="gold-text">Tamil Nadu, India</span>
+              <p>Serving businesses Pan-India</p>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="container footer-inner">
+        <div class="footer-brand">
+          <img src="logo.png" alt="JOTHI POS" class="footer-logo" />
+          <p class="footer-tagline">Smart Billing. Premium Experience.</p>
+          <p class="footer-desc">India's trusted POS hardware brand since 2021. Quality products, honest prices, and
+            after-sales support you can count on.</p>
+          <div class="footer-socials">
+            <a href="https://wa.me/919025957649" target="_blank" class="social-link" id="footer-whatsapp"
+              aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            <a href="tel:+919025957649" class="social-link" id="footer-phone" aria-label="Call"><i
+                class="fas fa-phone-alt"></i></a>
+            <a href="#" class="social-link" id="footer-instagram" aria-label="Instagram"><i
+                class="fab fa-instagram"></i></a>
+            <a href="#" class="social-link" id="footer-facebook" aria-label="Facebook"><i
+                class="fab fa-facebook-f"></i></a>
+          </div>
+        </div>
+        <div class="footer-links-group">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#products">Products</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>Products</h4>
+          <ul>
+            <li><a href="#products">Thermal Printers 58mm</a></li>
+            <li><a href="#products">Thermal Printers 80mm</a></li>
+            <li><a href="#products">Barcode Scanners</a></li>
+            <li><a href="#products">Paper Rolls</a></li>
+            <li><a href="#products">POS Accessories</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="tel:+919025957649"><i class="fas fa-phone-alt"></i> +91 9025957649</a></li>
+            <li><a href="https://wa.me/919025957649" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Us</a>
+            </li>
+            <li><span><i class="fas fa-map-marker-alt"></i> Tamil Nadu, India</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>© <span id="footer-year"></span> <span class="gold-text">JOTHI POS</span>. All rights reserved. Crafted with
+          ❤️ in India.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===================== FLOATING BUTTONS ===================== -->
+  <div class="floating-buttons" id="floating-buttons">
+    <a href="https://wa.me/919025957649?text=Hello%20JOTHI%20POS!%20I%20need%20help%20with%20a%20product."
+      target="_blank" class="fab-btn fab-whatsapp" id="fab-whatsapp" title="Chat on WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+      <span class="fab-label">WhatsApp</span>
+    </a>
+    <a href="tel:+919025957649" class="fab-btn fab-call" id="fab-call" title="Call Now">
+      <i class="fas fa-phone-alt"></i>
+      <span class="fab-label">Call Now</span>
+    </a>
+  </div>
+
+  <!-- ===================== BACK TO TOP ===================== -->
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="products.js"></script>
+  <script src="app.js"></script>
+  <script src="cart.js"></script>
+</body>
+
+</html>
