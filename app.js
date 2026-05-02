@@ -185,6 +185,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       flipCardContainer.classList.remove('flipped');
       orderForm.reset();
+      const step1 = document.getElementById('checkout-step-1');
+      const step2 = document.getElementById('checkout-step-2');
+      if (step1 && step2) {
+        step1.style.display = 'block';
+        step2.style.display = 'none';
+      }
     }, 300); // wait for fade out
   }
 
@@ -234,6 +240,40 @@ document.addEventListener('DOMContentLoaded', () => {
     modalOverlay.classList.add('active');
     flipCardContainer.classList.add('flipped');
   };
+
+  // Checkout Steps Logic
+  const step1 = document.getElementById('checkout-step-1');
+  const step2 = document.getElementById('checkout-step-2');
+  const btnProceedPayment = document.getElementById('btn-proceed-payment');
+  const btnBackToStep1 = document.getElementById('btn-back-to-step1');
+
+  function transitionSteps(hideStep, showStep) {
+    hideStep.style.transition = 'opacity 0.2s ease';
+    hideStep.style.opacity = '0';
+    setTimeout(() => {
+      hideStep.style.display = 'none';
+      showStep.style.display = 'block';
+      showStep.style.opacity = '0';
+      // Trigger reflow
+      void showStep.offsetWidth;
+      showStep.style.transition = 'opacity 0.2s ease';
+      showStep.style.opacity = '1';
+    }, 200);
+  }
+
+  if (btnProceedPayment) {
+    btnProceedPayment.addEventListener('click', () => {
+      if (orderForm.reportValidity()) {
+        transitionSteps(step1, step2);
+      }
+    });
+  }
+
+  if (btnBackToStep1) {
+    btnBackToStep1.addEventListener('click', () => {
+      transitionSteps(step2, step1);
+    });
+  }
 
   // Form Submit Handler
   orderForm.addEventListener('submit', (e) => {
@@ -447,4 +487,21 @@ window.handleFormSubmit = function(e) {
     document.getElementById('fallback-contact-form').style.display = 'none';
     document.getElementById('form-success').style.display = 'block';
   }, 1000);
+}
+
+// Global copy text utility for fast payment
+window.copyText = function(text, btnElement) {
+  navigator.clipboard.writeText(text).then(() => {
+    const originalHTML = btnElement.innerHTML;
+    btnElement.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    btnElement.style.color = '#111';
+    btnElement.style.background = 'var(--color-gold)';
+    setTimeout(() => {
+      btnElement.innerHTML = originalHTML;
+      btnElement.style.color = 'var(--color-gold)';
+      btnElement.style.background = 'rgba(212,175,55,0.1)';
+    }, 2000);
+  }).catch(err => {
+    console.error('Could not copy text: ', err);
+  });
 }
